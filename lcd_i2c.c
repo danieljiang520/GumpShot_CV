@@ -294,3 +294,38 @@ static void DelayUS(uint32_t us) {
     cnt = DWT->CYCCNT - start;
   } while(cnt < cycles);
 }
+
+void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction) {
+	HD44780_Clear();
+	HD44780_SetCursor(2, 0);
+	HD44780_PrintStr("Mode: ");
+	if(mode == 0) {
+		HD44780_PrintStr("Manual");
+	} else if(mode == 1) {
+		HD44780_PrintStr("Easy");
+	} else if(mode == 2) {
+		HD44780_PrintStr("Medium");
+	} else {
+		HD44780_PrintStr("Hard");
+	}
+
+	char sfreq[5];
+	HD44780_SetCursor(2, 1);
+	HD44780_PrintStr("Frequency: ");
+	itoa(freq, sfreq, 10);
+	HD44780_PrintStr(sfreq);
+
+	char sspeed[5];
+	HD44780_SetCursor(2, 2);
+	HD44780_PrintStr("Speed: ");
+	itoa(speed, sspeed, 10);
+	HD44780_PrintStr(sspeed);
+	HD44780_PrintStr(" units");
+
+  char sdirection[5];
+  HD44780_SetCursor(0, 3);
+  HD44780_PrintStr("Direction: ");
+  itoa(direction, sdirection, 10);
+  HD44780_PrintStr(sdirection);
+	HD44780_PrintStr(" º");  
+}

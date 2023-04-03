@@ -55,7 +55,7 @@
 #define RS 0x01
 
 /* Device I2C Address */
-#define DEVICE_ADDR     (0x3F << 1)
+#define DEVICE_ADDR    (0x27 << 1)
 
 void HD44780_Init(uint8_t rows);
 void HD44780_Clear();
@@ -84,5 +84,6 @@ void HD44780_SetCursor(uint8_t, uint8_t);
 void HD44780_SetBacklight(uint8_t new_val);
 void HD44780_LoadCustomCharacter(uint8_t char_num, uint8_t *rows);
 void HD44780_PrintStr(const char[]);
+void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction);
 
 #endif /* LIQUIDCRYSTAL_I2C_H_ */
