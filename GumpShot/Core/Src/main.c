@@ -106,11 +106,11 @@ int main(void)
   while (1)
   {
 	  LauncherMotors(50);
-	  //Rotate(1);
+	  Rotate(0);
 	  LockingServo();
 	  HAL_Delay(5000);
 	  LauncherMotors(20);
-	  Rotate(45);
+	  //Rotate(10);
 	  HAL_Delay(5000);
 
     /* USER CODE END WHILE */
@@ -187,9 +187,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 7999;
+  htim1.Init.Prescaler = 844;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 199;
+  htim1.Init.Period = 1999;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -294,22 +294,31 @@ static void MX_GPIO_Init(void)
 void LockingServo(){
 	uint32_t * tim1_ccr = (uint32_t *)(TIM1_ADDR + TIM_CCR1_OFFSET);
 	*tim1_ccr &= ~CCR_MASK;
-	*tim1_ccr |= 12;
-	HAL_Delay(1000);
+	*tim1_ccr |= 80;
+	HAL_Delay(250);
 	*tim1_ccr &= ~CCR_MASK;
-	*tim1_ccr |= 18;
+	*tim1_ccr |= 150;
 }
 
 void Rotate(uint32_t degrees) {
 	uint32_t * tim1_ccr = (uint32_t *)(TIM1_ADDR + TIM_CCR2_OFFSET);
 	*tim1_ccr &= ~CCR_MASK;
-	*tim1_ccr |= ((degrees / 18) + 10);
+	// if degrees is greater than max degrees, set to max degrees
+	// if degrees is less than min degrees, set to min degrees
+	// Above code gaurantees that launcher always points to a location on the table
+	// zero_offset = number of degrees difference between servo's 0 position and
+	// launcher pointed 90 degrees to the left of center
+	// servo_range is the amount of degrees the servo can turn, which
+	// corresponds to the 0.75 to 2.25 ms pulse range
+	// *tim1_ccr |= ((((degrees + zero_offset) * 225) / servo_range) + 75);
+	*tim1_ccr |= ((((degrees + 20) * 225) / 120) + 75);
 }
 
 void LauncherMotors(uint32_t power) {
 	uint32_t * tim1_ccr = (uint32_t *)(TIM1_ADDR + TIM_CCR3_OFFSET);
 	*tim1_ccr &= ~CCR_MASK;
-	*tim1_ccr |= power * 2;
+	// Limit max power by dividing below by a number.
+	*tim1_ccr |= power * 20;
 }
 
 /* USER CODE END 4 */
