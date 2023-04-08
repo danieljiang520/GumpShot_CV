@@ -31,12 +31,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define CCR_MASK 0xFFFF
-#define TIM1_ADDR 0x40010000 // timer 1 base register
-#define TIM_CCR_OFFSET 0x34 //capture/compare register
-#define TIM_CCR1_OFFSET 0x34
-#define TIM_CCR2_OFFSET 0x38
-#define TIM_CCR3_OFFSET 0x3C
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,6 +40,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
 
@@ -55,6 +50,7 @@ TIM_HandleTypeDef htim1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 static void LockingServo();
 static void Rotate(uint32_t degrees);
@@ -94,24 +90,41 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  uint32_t launcher_timer = 0;
+  uint32_t launcher_frequency = 10;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  LauncherMotors(50);
-	  Rotate(0);
-	  LockingServo();
-	  HAL_Delay(5000);
-	  LauncherMotors(20);
-	  //Rotate(10);
-	  HAL_Delay(5000);
+	  if (launcher_timer == launcher_frequency) {
+  	  	  launcher_timer = 0;
+  	  }
+	  else {
+		  launcher_timer = launcher_timer + 1;
+	  }
+	  // Set launcher motors to proper power
+	  LauncherMotors(24);
+	  // Rotate launcher to proper location
+	  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+		  LockingServo();
+	  }
+	  if (launcher_timer > 5) {
+		  LauncherMotors(24);
+		  Rotate(0);
+	  }
+	  else {
+		  LauncherMotors(30);
+		  Rotate(90);
+	  }
+
+	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
@@ -250,6 +263,65 @@ static void MX_TIM1_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 844;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 1999;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -267,11 +339,11 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : USART_TX_Pin USART_RX_Pin */
   GPIO_InitStruct.Pin = USART_TX_Pin|USART_RX_Pin;
@@ -292,33 +364,24 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void LockingServo(){
-	uint32_t * tim1_ccr = (uint32_t *)(TIM1_ADDR + TIM_CCR1_OFFSET);
-	*tim1_ccr &= ~CCR_MASK;
-	*tim1_ccr |= 80;
-	HAL_Delay(250);
-	*tim1_ccr &= ~CCR_MASK;
-	*tim1_ccr |= 150;
+	TIM1->CCR1 = 80;
+	HAL_Delay(300);
+	TIM1->CCR1 = 150;
 }
 
 void Rotate(uint32_t degrees) {
-	uint32_t * tim1_ccr = (uint32_t *)(TIM1_ADDR + TIM_CCR2_OFFSET);
-	*tim1_ccr &= ~CCR_MASK;
-	// if degrees is greater than max degrees, set to max degrees
-	// if degrees is less than min degrees, set to min degrees
-	// Above code gaurantees that launcher always points to a location on the table
-	// zero_offset = number of degrees difference between servo's 0 position and
-	// launcher pointed 90 degrees to the left of center
-	// servo_range is the amount of degrees the servo can turn, which
-	// corresponds to the 0.75 to 2.25 ms pulse range
-	// *tim1_ccr |= ((((degrees + zero_offset) * 225) / servo_range) + 75);
-	*tim1_ccr |= ((((degrees + 20) * 225) / 120) + 75);
+	if (degrees > 135) {
+		degrees = 135;
+	}
+	if (degrees < 45) {
+		degrees = 45;
+	}
+	TIM1->CCR2 = (((degrees * 5) / 4) + 75);
 }
 
 void LauncherMotors(uint32_t power) {
-	uint32_t * tim1_ccr = (uint32_t *)(TIM1_ADDR + TIM_CCR3_OFFSET);
-	*tim1_ccr &= ~CCR_MASK;
-	// Limit max power by dividing below by a number.
-	*tim1_ccr |= power * 20;
+	TIM2->CCR1 = power * 20;
+	// Limit max power by dividing by a number.
 }
 
 /* USER CODE END 4 */
