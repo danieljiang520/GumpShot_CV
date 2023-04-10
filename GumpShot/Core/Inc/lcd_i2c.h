@@ -84,7 +84,7 @@ void HD44780_SetCursor(uint8_t, uint8_t);
 void HD44780_SetBacklight(uint8_t new_val);
 void HD44780_LoadCustomCharacter(uint8_t char_num, uint8_t *rows);
 void HD44780_PrintStr(const char[]);
-void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction);
+void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction, uint8_t error);
 void lcd_init();
 
 #endif /* LIQUIDCRYSTAL_I2C_H_ */

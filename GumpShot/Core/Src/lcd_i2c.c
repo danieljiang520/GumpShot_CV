@@ -295,8 +295,17 @@ static void DelayUS(uint32_t us) {
   } while(cnt < cycles);
 }
 
-void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction) {
+void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction, uint8_t error) {
 	HD44780_Clear();
+
+  if(error) {
+	  HD44780_SetCursor(1, 1);
+    HD44780_PrintStr("Error: Controller");
+    HD44780_SetCurssor(4, 2);
+    HD44780_PrintStr("not working");
+    return;
+  }
+
 	HD44780_SetCursor(2, 0);
 	HD44780_PrintStr("Mode: ");
 	if(mode == 0) {
