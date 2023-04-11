@@ -96,28 +96,128 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   uint32_t launcher_timer = 0;
-  uint32_t launcher_frequency = 10;
+  uint32_t launcher_period = 10;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if (launcher_timer == launcher_frequency) {
+	  // if manual mode
+	  	  // if user presses button to increase motor speed
+	  	  	  // manual_launcher_speed = manual_launcher_speed + 5;
+	  	  // if user presses button to decrease motor speed
+	  	  	  // manual_launcher_speed = manual_launcher_speed - 5;
+		  // if manual_launcher_speed > 100
+			  // manual_launcher_speed = 100;
+		  // if manual_launcher_speed < 0
+	  	  	  // manual_launcher_speed = 0;
+
+	  	  // LauncherMotors(maunual_launcher_speed)
+
+
+	  	  // if user presses button to increase rotation (to the right)
+	  	  	  // manual_launcher_rotation = manual_launcher_rotation + 3
+	  	  // if user presses button to decrease rotation (to the left)
+	  	  	  // manual_launcher_rotation = manual_launcher_rotation - 3
+	  	  // if manual_launcher_rotation > 135
+	  		  // manual_launcher_rotation = 135;
+	  	  // if manual_launcher_rotation < 0
+	  	  	  // manual_launcher_rotation = 0;
+
+	  	  // Rotate(manual_launcher_rotation)
+
+	  	  // if user presses button to launch ping pong ball
+	  	  	  // LockingServo();
+	  	  // Display to LCD
+
+
+	  // if in easy mode
+	  	  // if user presses button to decrease launching frequency
+	  	  	  // launcher_period = launcher_period + 10;
+	  	  // if user presses button to increase launching frequency
+	  	  	  // launcher_period = launcher_period - 10;
+	  	  // if launcher_period < 20
+	  	  	  // launcher_period = 20;
+
+//	  	  if (launcher_timer == launcher_frequency) {
+//			  launcher_timer = 0;
+//			  LockingServo();
+//		  }
+//	  	  else {
+//	  		  launcher_timer = launcher_timer + 1;
+//	  	  }
+
+	  	  // get paddle location (depth) from pi
+		  // calculate motor speed
+		  // Set launcher motors to proper power
+		  // LauncherMotors(speed);
+		  // get paddle location (side to side) from pi
+		  // calculate rotational degrees
+		  // Rotate launcher to proper location
+		  // Rotate(degrees);
+//		  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+//			  LockingServo();
+//		  }
+
+	  	  // Display to LCD
+
+
+
+	  // if in hard mode
+		  // if user presses button to decrease launching frequency
+			  // launcher_period = launcher_period + 10;
+		  // if user presses button to increase launching frequency
+			  // launcher_period = launcher_period - 10;
+		  // if launcher_period < 20
+			  // launcher_period = 20;
+
+//		  if (launcher_timer == launcher_frequency) {
+//			  launcher_timer = 0;
+//			  LockingServo();
+//		  }
+//		  else {
+//			  launcher_timer = launcher_timer + 1;
+//		  }
+
+		  // get paddle location (depth) from pi
+		  // calculate motor speed
+		  // Set launcher motors to proper power
+		  // LauncherMotors(speed);
+		  // get paddle location (side to side) from pi
+		  // calculate rotational degrees
+		  // Rotate launcher to proper location
+		  // Rotate(degrees);
+//		  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+//			  LockingServo();
+//		  }
+
+	  	  // Display to LCD
+
+
+
+
+	  if (launcher_timer == launcher_period) {
   	  	  launcher_timer = 0;
+  	  	  //LockingServo();
   	  }
 	  else {
 		  launcher_timer = launcher_timer + 1;
 	  }
+	  // get paddle location (depth) from pi
+	  // calculate motor speed
 	  // Set launcher motors to proper power
 	  LauncherMotors(24);
+	  // get paddle location (side to side) from pi
+	  // calculate rotational degrees
 	  // Rotate launcher to proper location
+
 	  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
 		  LockingServo();
 	  }
 	  if (launcher_timer > 5) {
 		  LauncherMotors(24);
-		  Rotate(0);
+		  Rotate(100);
 	  }
 	  else {
 		  LauncherMotors(30);
