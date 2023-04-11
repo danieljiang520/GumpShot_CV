@@ -101,15 +101,14 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   lcd_init();
-  HD44780_Init(4);
-  HD44780_Clear();
-  HD44780_SetBacklight(5);
+
   uint8_t mode = 1; // mode: 0 = manual, 1 = easy, 2 = hard
   uint16_t freq = 5; // frequency (s):
   uint16_t speed = 25; // speed (m/s);
   uint16_t direction = 90; // turning direction (º): 0 = center, -90 = left, 90 = right
   uint32_t launcher_timer = 0;
   uint32_t launcher_period = 10;
+
   ControllerState controllerState = controllerCreate();
   ManualState manualState = {0, 0, 0, 0};
   /* USER CODE END 2 */
@@ -212,7 +211,7 @@ int main(void)
 
 
 	  // Hard coded test loop
-	  lcd_display(mode, launcher_period, speed, direction);
+	  lcd_display(mode, launcher_period, speed, direction, 0);
 	  controllerRead(&controllerState, &manualState);
 	  if (launcher_timer == launcher_period) {
   	  	  launcher_timer = 0;

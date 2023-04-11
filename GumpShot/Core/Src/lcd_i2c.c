@@ -295,8 +295,17 @@ static void DelayUS(uint32_t us) {
   } while(cnt < cycles);
 }
 
-void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction) {
+void lcd_display(uint8_t mode, uint32_t freq, uint16_t speed, uint16_t direction, uint8_t error) {
 	HD44780_Clear();
+
+  if(error) {
+	  HD44780_SetCursor(1, 1);
+    HD44780_PrintStr("Error: Controller");
+    HD44780_SetCursor(4, 2);
+    HD44780_PrintStr("not working");
+    return;
+  }
+
 	HD44780_SetCursor(2, 0);
 	HD44780_PrintStr("Mode: ");
 	if(mode == 0) {
@@ -323,11 +332,11 @@ void lcd_display(uint8_t mode, uint16_t freq, uint16_t speed, uint16_t direction
 	HD44780_PrintStr(" units");
 
   char sdirection[5];
-  HD44780_SetCursor(0, 3);
+  HD44780_SetCursor(2, 3);
   HD44780_PrintStr("Direction: ");
   itoa(direction, sdirection, 10);
   HD44780_PrintStr(sdirection);
-	HD44780_PrintStr(" º");  
+	HD44780_PrintSpecialChar(0xdf);
 }
 
 void lcd_init() {
