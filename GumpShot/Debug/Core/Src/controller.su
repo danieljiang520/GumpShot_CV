@@ -1,3 +1,4 @@
 ../Core/Src/controller.c:14:17:controllerCreate	32	static
-../Core/Src/controller.c:28:6:initController	80	static
-../Core/Src/controller.c:83:6:controllerRead	64	static
+../Core/Src/controller.c:25:13:manualStateCreate	32	static
+../Core/Src/controller.c:35:6:initController	80	static
+../Core/Src/controller.c:90:6:controllerRead	64	static

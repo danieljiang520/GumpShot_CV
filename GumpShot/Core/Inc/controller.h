@@ -47,6 +47,7 @@ typedef struct {
 
 /************************************** Public functions **************************************/
 ControllerState controllerCreate(void);
+ManualState manualStateCreate(void);
 void controllerInit(void);
 void controllerRead(ControllerState *controllerState, ManualState *manualState);
 

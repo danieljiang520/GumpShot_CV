@@ -11,7 +11,7 @@
 /**
  * Create new Lcd_HandleTypeDef and initialize the Lcd
  */
-ControllerState controllerCreate()
+ControllerState controllerCreate(void)
 {
 	// Set all button to not pressed
 	ControllerState controllerState = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -19,6 +19,13 @@ ControllerState controllerCreate()
 	initController();
 
 	return controllerState;
+}
+
+
+ManualState manualStateCreate(void)
+{
+	ManualState manualState = {0, 0, 0, 0};
+	return manualState;
 }
 
 

@@ -110,7 +110,7 @@ int main(void)
   uint32_t launcher_period = 10;
 
   ControllerState controllerState = controllerCreate();
-  ManualState manualState = {0, 0, 0, 0};
+  ManualState manualState = manualStateCreate();
   /* USER CODE END 2 */
 
   /* Infinite loop */
