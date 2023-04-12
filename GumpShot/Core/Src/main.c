@@ -136,6 +136,7 @@ int main(void)
 	  }
 
 
+
 	  // if in easy mode
 	  	  // if user presses button to decrease launching frequency
 	  	  	  // launcher_period = launcher_period + 10;

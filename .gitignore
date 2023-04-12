@@ -43,3 +43,8 @@
 
 # Libraries
 /lib
+
+**/Debug/
+**/Release/
+**/.metadata
+**/.launch

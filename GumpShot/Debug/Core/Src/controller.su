@@ -1,5 +1,0 @@
-../Core/Src/controller.c:16:13:buttonCreate	40	static
-../Core/Src/controller.c:29:17:controllerStateCreate	48	static
-../Core/Src/controller.c:39:6:controllerInit	80	static
-../Core/Src/controller.c:94:6:controllerRead	80	static
-../Core/Src/controller.c:177:6:updateGameConfig	16	static
