@@ -33,6 +33,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEFAULT_MODE 0
+#define DEFAULT_SPEED 25
+#define DEFAULT_DIRECTION 90
+#define DEFAULT_PERIOD 10
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -105,13 +110,14 @@ int main(void)
   lcd_init();
 
 //  uint8_t mode = 1; // mode: 0 = manual, 1 = easy, 2 = hard
-//  uint16_t freq = 5; // frequency (s):
 //  uint16_t speed = 25; // speed (m/s);
 //  uint16_t direction = 90; // turning direction (º): 0 = center, -90 = left, 90 = right
 //  uint32_t launcher_timer = 0;
 //  uint32_t launcher_period = 10;
 
-  GameConfig gameConfig = {0,5,25,90,0,10};
+
+  // gameConfig contains the followings: mode, speed, direction, launcher_timer, and launcher_period
+  GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD};
   ButtonState buttonState = buttonCreate();
   ControllerState controllerState = controllerStateCreate();
   /* USER CODE END 2 */

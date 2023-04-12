@@ -39,7 +39,6 @@ extern "C" {
 
 typedef struct {
 	uint8_t mode; // mode: 0 = manual, 1 = easy, 2 = hard
-	uint16_t freq; // frequency (s):
 	uint16_t speed; // speed (m/s);
 	uint16_t direction; // turning direction (º): 90 = center, 180 = left, 0 = right
 	uint32_t launcher_timer;
