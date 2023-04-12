@@ -37,6 +37,15 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+typedef struct {
+	uint8_t mode; // mode: 0 = manual, 1 = easy, 2 = hard
+	uint16_t freq; // frequency (s):
+	uint16_t speed; // speed (m/s);
+	uint16_t direction; // turning direction (º): 90 = center, 180 = left, 0 = right
+	uint32_t launcher_timer;
+	uint32_t launcher_period;
+} GameConfig;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -55,6 +64,10 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+
+void LockingServo();
+void Rotate(uint32_t degrees);
+void LauncherMotors(uint32_t power);
 
 /* USER CODE END EFP */
 
