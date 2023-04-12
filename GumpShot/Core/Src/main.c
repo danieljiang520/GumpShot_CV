@@ -22,15 +22,22 @@
 /* USER CODE BEGIN Includes */
 #include "controller.h"
 #include "lcd_i2c.h"
+#include "manual.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEFAULT_MODE 0
+#define DEFAULT_SPEED 25
+#define DEFAULT_DIRECTION 90
+#define DEFAULT_PERIOD 10
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,13 +63,13 @@ static void MX_TIM3_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
 /* USER CODE BEGIN PFP */
-static void LockingServo();
-static void Rotate(uint32_t degrees);
-static void LauncherMotors(uint32_t power);
+
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 
 /* USER CODE END 0 */
 
@@ -102,48 +109,32 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   lcd_init();
 
-  uint8_t mode = 1; // mode: 0 = manual, 1 = easy, 2 = hard
-  uint16_t freq = 5; // frequency (s):
-  uint16_t speed = 25; // speed (m/s);
-  uint16_t direction = 90; // turning direction (º): 0 = center, -90 = left, 90 = right
-  uint32_t launcher_timer = 0;
-  uint32_t launcher_period = 10;
+//  uint8_t mode = 1; // mode: 0 = manual, 1 = easy, 2 = hard
+//  uint16_t speed = 25; // speed (m/s);
+//  uint16_t direction = 90; // turning direction (º): 0 = center, -90 = left, 90 = right
+//  uint32_t launcher_timer = 0;
+//  uint32_t launcher_period = 10;
 
-  ControllerState controllerState = controllerCreate();
-  ManualState manualState = {0, 0, 0, 0};
+
+  // gameConfig contains the followings: mode, speed, direction, launcher_timer, and launcher_period
+  GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD};
+  ButtonState buttonState = buttonCreate();
+  ControllerState controllerState = controllerStateCreate();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // NOTE: maybe make lcd_display take in &gameConfig instead
+	  lcd_display(gameConfig.mode, gameConfig.launcher_period, gameConfig.speed, gameConfig.direction, 0);
+	  controllerRead(&buttonState, &controllerState, &gameConfig);
+
 	  // if manual mode
-	  	  // if user presses button to increase motor speed
-	  	  	  // manual_launcher_speed = manual_launcher_speed + 5;
-	  	  // if user presses button to decrease motor speed
-	  	  	  // manual_launcher_speed = manual_launcher_speed - 5;
-		  // if manual_launcher_speed > 100
-			  // manual_launcher_speed = 100;
-		  // if manual_launcher_speed < 0
-	  	  	  // manual_launcher_speed = 0;
+	  if (gameConfig.mode == 0) {
+		  runManualMode(&controllerState, &gameConfig);
+	  }
 
-	  	  // LauncherMotors(maunual_launcher_speed)
-
-
-	  	  // if user presses button to increase rotation (to the right)
-	  	  	  // manual_launcher_rotation = manual_launcher_rotation + 3
-	  	  // if user presses button to decrease rotation (to the left)
-	  	  	  // manual_launcher_rotation = manual_launcher_rotation - 3
-	  	  // if manual_launcher_rotation > 135
-	  		  // manual_launcher_rotation = 135;
-	  	  // if manual_launcher_rotation < 0
-	  	  	  // manual_launcher_rotation = 0;
-
-	  	  // Rotate(manual_launcher_rotation)
-
-	  	  // if user presses button to launch ping pong ball
-	  	  	  // LockingServo();
-	  	  // Display to LCD
 
 
 	  // if in easy mode
@@ -154,7 +145,7 @@ int main(void)
 	  	  // if launcher_period < 20
 	  	  	  // launcher_period = 20;
 
-//	  	  if (launcher_timer == launcher_frequency) {
+//	  	  if (launcher_timer >= launcher_period) {
 //			  launcher_timer = 0;
 //			  LockingServo();
 //		  }
@@ -211,36 +202,34 @@ int main(void)
 
 
 	  // Hard coded test loop
-	  lcd_display(mode, launcher_period, speed, direction, 0);
-	  controllerRead(&controllerState, &manualState);
-	  if (launcher_timer == launcher_period) {
-  	  	  launcher_timer = 0;
-  	  	  //LockingServo();
-  	  }
-	  else {
-		  launcher_timer = launcher_timer + 1;
-	  }
-	  // get paddle location (depth) from pi
-	  // calculate motor speed
-	  // Set launcher motors to proper power
-	  LauncherMotors(24);
-	  // get paddle location (side to side) from pi
-	  // calculate rotational degrees
-	  // Rotate launcher to proper location
+//	  if (launcher_timer == launcher_period) {
+//  	  	  launcher_timer = 0;
+//  	  	  //LockingServo();
+//  	  }
+//	  else {
+//		  launcher_timer = launcher_timer + 1;
+//	  }
+//	  // get paddle location (depth) from pi
+//	  // calculate motor speed
+//	  // Set launcher motors to proper power
+//	  LauncherMotors(24);
+//	  // get paddle location (side to side) from pi
+//	  // calculate rotational degrees
+//	  // Rotate launcher to proper location
+//
+//	  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+//		  LockingServo();
+//	  }
+//	  if (launcher_timer > 5) {
+//		  LauncherMotors(24);
+//		  Rotate(100);
+//	  }
+//	  else {
+//		  LauncherMotors(30);
+//		  Rotate(90);
+//	  }
 
-	  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
-		  LockingServo();
-	  }
-	  if (launcher_timer > 5) {
-		  LauncherMotors(24);
-		  Rotate(100);
-	  }
-	  else {
-		  LauncherMotors(30);
-		  Rotate(90);
-	  }
-
-	  HAL_Delay(1000);
+	  HAL_Delay(100);
 
     /* USER CODE END WHILE */
 
@@ -488,6 +477,7 @@ void LauncherMotors(uint32_t power) {
 	TIM2->CCR1 = power * 20;
 	// Limit max power by dividing by a number.
 }
+
 
 /* USER CODE END 4 */
 

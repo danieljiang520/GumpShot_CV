@@ -1,6 +1,8 @@
 /*
- * controller.c
+ * controller.h
  *
+ *  Created on: Apr 10, 2023
+ *      Author: danieljiang
  */
 
 #include "controller.h"
@@ -9,15 +11,24 @@
 /************************************** Function definitions **************************************/
 
 /**
- * Create new Lcd_HandleTypeDef and initialize the Lcd
+ * Create new ButtonState and initialize the PS1 controller
  */
-ControllerState controllerCreate()
+ButtonState buttonCreate(void)
 {
 	// Set all button to not pressed
-	ControllerState controllerState = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	ButtonState buttonState = {1, 1, 1, 1,
+							   1, 1, 1, 1,
+							   1, 1, 1, 1};
 
-	initController();
+	controllerInit();
 
+	return buttonState;
+}
+
+
+ControllerState controllerStateCreate(void)
+{
+	ControllerState controllerState = {0, 0, 0, 0, 0, 0};
 	return controllerState;
 }
 
@@ -25,7 +36,7 @@ ControllerState controllerCreate()
 /**
  * Initialize Controller by sending SPI commands
  */
-void initController(void)
+void controllerInit(void)
 {
 	uint8_t data[21];
 
@@ -80,7 +91,7 @@ void initController(void)
 /**
  * Read Controller by sending SPI pulling command
  */
-void controllerRead(ControllerState *controllerState, ManualState *manualState)
+void controllerRead(ButtonState *buttonState, ControllerState *controllerState, GameConfig *gameConfig)
 {
 	/* Send pulling command to controller */
 	uint8_t data[5];
@@ -96,14 +107,14 @@ void controllerRead(ControllerState *controllerState, ManualState *manualState)
 	uint8_t up = (data[3] >> 4) & 0b1;
 
 	uint8_t start = (data[3] >> 3) & 0b1;
-//	uint8_t R3 = (data[3] >> 2) & 0b1;
-//	uint8_t L3 = (data[3] >> 1) & 0b1;
+	uint8_t R3 = (data[3] >> 2) & 0b1;
+	uint8_t L3 = (data[3] >> 1) & 0b1;
 	uint8_t select = data[3] & 0b1;
 
-//	uint8_t square = (data[4] >> 7) & 0b1;
-//	uint8_t X = (data[4] >> 6) & 0b1;
-//	uint8_t O = (data[4] >> 5) & 0b1;
-//	uint8_t triangle = (data[4] >> 4) & 0b1;
+	uint8_t square = (data[4] >> 7) & 0b1;
+	uint8_t X = (data[4] >> 6) & 0b1;
+	uint8_t O = (data[4] >> 5) & 0b1;
+	uint8_t triangle = (data[4] >> 4) & 0b1;
 
 	uint8_t R1 = (data[4] >> 3) & 0b1;
 	uint8_t L1 = (data[4] >> 2) & 0b1;
@@ -111,43 +122,75 @@ void controllerRead(ControllerState *controllerState, ManualState *manualState)
 	uint8_t L2 = data[4] & 0b1;
 
 	/* Update manual state only when button is released: 0->1 */
-	uint8_t releasedLeft = !controllerState->left && left;
-	uint8_t releasedDown = !controllerState->down && down;
-	uint8_t releasedRight = !controllerState->right && right;
-	uint8_t releasedUp = !controllerState->up && up;
+	uint8_t releasedLeft = !buttonState->left && left;
+	uint8_t releasedDown = !buttonState->down && down;
+	uint8_t releasedRight = !buttonState->right && right;
+	uint8_t releasedUp = !buttonState->up && up;
 
-	uint8_t releasedStart = !controllerState->start && start;
-//	uint8_t releasedR3 = !controllerState->R3 && R3;
-//	uint8_t releasedL3 = !controllerState->L3 && L3;
-	uint8_t releasedSelect = !controllerState->select && select;
+	uint8_t releasedStart = !buttonState->start && start;
+	uint8_t releasedR3 = !buttonState->R3 && R3;
+	uint8_t releasedL3 = !buttonState->L3 && L3;
+	uint8_t releasedSelect = !buttonState->select && select;
 
-//	uint8_t releasedSquare = !controllerState->square && square;
-//	uint8_t releasedX = !controllerState->X && X;
-//	uint8_t releasedO = !controllerState->O && O;
-//	uint8_t releasedTriangle = !controllerState->triangle && triangle;
+	uint8_t releasedSquare = !buttonState->square && square;
+	uint8_t releasedX = !buttonState->X && X;
+	uint8_t releasedO = !buttonState->O && O;
+	uint8_t releasedTriangle = !buttonState->triangle && triangle;
 
-	uint8_t releasedR1 = !controllerState->R1 && R1;
-	uint8_t releasedL1 = !controllerState->L1 && L1;
-	uint8_t releasedR2 = !controllerState->R2 && R2;
-	uint8_t releasedL2 = !controllerState->L2 && L2;
+	uint8_t releasedR1 = !buttonState->R1 && R1;
+	uint8_t releasedL1 = !buttonState->L1 && L1;
+	uint8_t releasedR2 = !buttonState->R2 && R2;
+	uint8_t releasedL2 = !buttonState->L2 && L2;
 
 	/* Update manual mode state */
-    manualState->direction = (releasedRight ? 1 : (releasedLeft ? -1 : 0));
-    manualState->freqControl = (releasedUp ? 1 : (releasedDown ? -1 : 0));
-    manualState->changeMode = (releasedSelect ? 1 : 0);
-    manualState->stop = (releasedL1 && releasedL2 && releasedR1 && releasedR2 ? 1 : 0);
+    controllerState->direction = (releasedRight ? 1 : (releasedLeft ? -1 : 0));
+    controllerState->freqControl = (releasedTriangle ? 1 : (releasedX ? -1 : 0));
+    controllerState->speedControl = (releasedUp ? 1 : (releasedDown ? -1 : 0));
+    controllerState->changeMode = (releasedSelect ? 1 : 0);
+    controllerState->launch = (releasedSquare ? 1 : 0);
+    controllerState->stop = (releasedL1 && releasedL2 && releasedR1 && releasedR2 ? 1 : 0);
 
-    controllerState->left = left;
-    controllerState->down = down;
-    controllerState->right = right;
-    controllerState->up = up;
+    buttonState->left = left;
+    buttonState->down = down;
+    buttonState->right = right;
+    buttonState->up = up;
 
-    controllerState->start = start;
-    controllerState->select = select;
+    buttonState->start = start;
+    buttonState->R3 = R3;
+    buttonState->L3 = L3;
+    buttonState->select = select;
 
-    controllerState->R1 = R1;
-    controllerState->L1 = L1;
-    controllerState->R2 = R2;
-    controllerState->L2 = L2;
+    buttonState->R1 = R1;
+    buttonState->L1 = L1;
+    buttonState->R2 = R2;
+    buttonState->L2 = L2;
+
+    buttonState->square = square;
+    buttonState->X = X;
+    buttonState->O = O;
+    buttonState->triangle = triangle;
+
+    updateGameConfig(controllerState, gameConfig);
+}
+
+
+void updateGameConfig(ControllerState *controllerState, GameConfig *gameConfig) {
+	// Update mode
+	if (controllerState->changeMode == 1) {
+		if (gameConfig->mode == 2) {
+			gameConfig->mode = 0;
+		} else {
+			++gameConfig->mode;
+		}
+	}
+
+	// Update frequency
+	if (controllerState->freqControl == 1) {
+		gameConfig->launcher_period += PERIOD_STEP;
+	}
+	else if (controllerState->freqControl == -1 & gameConfig->launcher_period >= PERIOD_STEP) {
+		gameConfig->launcher_period -= PERIOD_STEP;
+	}
+
 }
 
