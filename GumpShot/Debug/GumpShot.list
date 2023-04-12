@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0002001c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000f1e4  00000000  00000000  0002004c  2**0
+ 12 .debug_info   0000f1bd  00000000  00000000  0002004c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00002019  00000000  00000000  0002f230  2**0
+ 13 .debug_abbrev 00002019  00000000  00000000  0002f209  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000f80  00000000  00000000  00031250  2**3
+ 14 .debug_aranges 00000f80  00000000  00000000  00031228  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00000ea0  00000000  00000000  000321d0  2**3
+ 15 .debug_ranges 00000ea0  00000000  00000000  000321a8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001624c  00000000  00000000  00033070  2**0
+ 16 .debug_macro  00016264  00000000  00000000  00033048  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000114ed  00000000  00000000  000492bc  2**0
+ 17 .debug_line   000114ed  00000000  00000000  000492ac  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0008b9e7  00000000  00000000  0005a7a9  2**0
+ 18 .debug_str    0008ba2e  00000000  00000000  0005a799  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000e6190  2**0
+ 19 .comment      00000050  00000000  00000000  000e61c7  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00004218  00000000  00000000  000e61e0  2**2
+ 20 .debug_frame  00004218  00000000  00000000  000e6218  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2118,12 +2118,12 @@ int main(void)
  8001106:	f002 fb59 	bl	80037bc <HAL_TIM_PWM_Start>
   lcd_init();
  800110a:	f7ff ffd7 	bl	80010bc <lcd_init>
-//  uint16_t speed = 25; // speed (m/s);
-//  uint16_t direction = 90; // turning direction (º): 0 = center, -90 = left, 90 = right
 //  uint32_t launcher_timer = 0;
 //  uint32_t launcher_period = 10;
 
-  GameConfig gameConfig = {0,5,25,90,0,10};
+
+  // gameConfig contains the followings: mode, speed, direction, launcher_timer, and launcher_period
+  GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD};
  800110e:	4b19      	ldr	r3, [pc, #100]	; (8001174 <main+0xa0>)
  8001110:	f107 0428 	add.w	r4, r7, #40	; 0x28
  8001114:	cb0f      	ldmia	r3, {r0, r1, r2, r3}
@@ -2144,8 +2144,8 @@ int main(void)
 	  lcd_display(gameConfig.mode, gameConfig.launcher_period, gameConfig.speed, gameConfig.direction, 0);
  800112c:	f897 0028 	ldrb.w	r0, [r7, #40]	; 0x28
  8001130:	6b79      	ldr	r1, [r7, #52]	; 0x34
- 8001132:	8dba      	ldrh	r2, [r7, #44]	; 0x2c
- 8001134:	8dfb      	ldrh	r3, [r7, #46]	; 0x2e
+ 8001132:	8d7a      	ldrh	r2, [r7, #42]	; 0x2a
+ 8001134:	8dbb      	ldrh	r3, [r7, #44]	; 0x2c
  8001136:	2400      	movs	r4, #0
  8001138:	9400      	str	r4, [sp, #0]
  800113a:	f7ff ff27 	bl	8000f8c <lcd_display>
@@ -2900,16 +2900,16 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
  800158c:	2b01      	cmp	r3, #1
  800158e:	d10a      	bne.n	80015a6 <runManualMode+0x28>
  8001590:	683b      	ldr	r3, [r7, #0]
- 8001592:	889b      	ldrh	r3, [r3, #4]
+ 8001592:	885b      	ldrh	r3, [r3, #2]
  8001594:	2b5f      	cmp	r3, #95	; 0x5f
  8001596:	d806      	bhi.n	80015a6 <runManualMode+0x28>
         gameConfig->speed += SPEED_STEP;
  8001598:	683b      	ldr	r3, [r7, #0]
- 800159a:	889b      	ldrh	r3, [r3, #4]
+ 800159a:	885b      	ldrh	r3, [r3, #2]
  800159c:	3305      	adds	r3, #5
  800159e:	b29a      	uxth	r2, r3
  80015a0:	683b      	ldr	r3, [r7, #0]
- 80015a2:	809a      	strh	r2, [r3, #4]
+ 80015a2:	805a      	strh	r2, [r3, #2]
  80015a4:	e00e      	b.n	80015c4 <runManualMode+0x46>
     // if user presses button to decrease motor speed
     else if (controllerState->speedControl == -1 && gameConfig->speed >= SPEED_STEP)
@@ -2918,20 +2918,20 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
  80015aa:	f1b3 3fff 	cmp.w	r3, #4294967295	; 0xffffffff
  80015ae:	d109      	bne.n	80015c4 <runManualMode+0x46>
  80015b0:	683b      	ldr	r3, [r7, #0]
- 80015b2:	889b      	ldrh	r3, [r3, #4]
+ 80015b2:	885b      	ldrh	r3, [r3, #2]
  80015b4:	2b04      	cmp	r3, #4
  80015b6:	d905      	bls.n	80015c4 <runManualMode+0x46>
         gameConfig->speed -= SPEED_STEP;
  80015b8:	683b      	ldr	r3, [r7, #0]
- 80015ba:	889b      	ldrh	r3, [r3, #4]
+ 80015ba:	885b      	ldrh	r3, [r3, #2]
  80015bc:	3b05      	subs	r3, #5
  80015be:	b29a      	uxth	r2, r3
  80015c0:	683b      	ldr	r3, [r7, #0]
- 80015c2:	809a      	strh	r2, [r3, #4]
+ 80015c2:	805a      	strh	r2, [r3, #2]
 
     LauncherMotors(gameConfig->speed);
  80015c4:	683b      	ldr	r3, [r7, #0]
- 80015c6:	889b      	ldrh	r3, [r3, #4]
+ 80015c6:	885b      	ldrh	r3, [r3, #2]
  80015c8:	4618      	mov	r0, r3
  80015ca:	f7ff ffc1 	bl	8001550 <LauncherMotors>
 
@@ -2942,16 +2942,16 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
  80015d2:	2b01      	cmp	r3, #1
  80015d4:	d10a      	bne.n	80015ec <runManualMode+0x6e>
  80015d6:	683b      	ldr	r3, [r7, #0]
- 80015d8:	88db      	ldrh	r3, [r3, #6]
+ 80015d8:	889b      	ldrh	r3, [r3, #4]
  80015da:	2b84      	cmp	r3, #132	; 0x84
  80015dc:	d806      	bhi.n	80015ec <runManualMode+0x6e>
         gameConfig->direction += DIRECTION_STEP;
  80015de:	683b      	ldr	r3, [r7, #0]
- 80015e0:	88db      	ldrh	r3, [r3, #6]
+ 80015e0:	889b      	ldrh	r3, [r3, #4]
  80015e2:	3303      	adds	r3, #3
  80015e4:	b29a      	uxth	r2, r3
  80015e6:	683b      	ldr	r3, [r7, #0]
- 80015e8:	80da      	strh	r2, [r3, #6]
+ 80015e8:	809a      	strh	r2, [r3, #4]
  80015ea:	e00d      	b.n	8001608 <runManualMode+0x8a>
     // if user presses button to decrease rotation (to the left)
     else if (controllerState->direction && gameConfig->direction >= DIRECTION_STEP)
@@ -2960,21 +2960,21 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
  80015f0:	2b00      	cmp	r3, #0
  80015f2:	d009      	beq.n	8001608 <runManualMode+0x8a>
  80015f4:	683b      	ldr	r3, [r7, #0]
- 80015f6:	88db      	ldrh	r3, [r3, #6]
+ 80015f6:	889b      	ldrh	r3, [r3, #4]
  80015f8:	2b02      	cmp	r3, #2
  80015fa:	d905      	bls.n	8001608 <runManualMode+0x8a>
         gameConfig->direction -= DIRECTION_STEP;
  80015fc:	683b      	ldr	r3, [r7, #0]
- 80015fe:	88db      	ldrh	r3, [r3, #6]
+ 80015fe:	889b      	ldrh	r3, [r3, #4]
  8001600:	3b03      	subs	r3, #3
  8001602:	b29a      	uxth	r2, r3
  8001604:	683b      	ldr	r3, [r7, #0]
- 8001606:	80da      	strh	r2, [r3, #6]
+ 8001606:	809a      	strh	r2, [r3, #4]
 
 
     Rotate(gameConfig->direction);
  8001608:	683b      	ldr	r3, [r7, #0]
- 800160a:	88db      	ldrh	r3, [r3, #6]
+ 800160a:	889b      	ldrh	r3, [r3, #4]
  800160c:	4618      	mov	r0, r3
  800160e:	f7ff ff81 	bl	8001514 <Rotate>
 
