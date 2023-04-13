@@ -127,12 +127,16 @@ int main(void)
   while (1)
   {
 	  // NOTE: maybe make lcd_display take in &gameConfig instead
-	  lcd_display(gameConfig.mode, gameConfig.launcher_period, gameConfig.speed, gameConfig.direction, 0);
+//	  lcd_display(gameConfig.mode, gameConfig.launcher_period, gameConfig.speed, gameConfig.direction, 0);
 	  controllerRead(&buttonState, &controllerState, &gameConfig);
 
 	  // if manual mode
 	  if (gameConfig.mode == 0) {
+		  lcd_display(gameConfig.mode, gameConfig.launcher_period, gameConfig.speed, gameConfig.direction, 0);
 		  runManualMode(&controllerState, &gameConfig);
+	  }
+	  else if (gameConfig.mode == 1) {
+		  runEasyMode(&gameConfig);
 	  }
 
 
@@ -229,7 +233,7 @@ int main(void)
 //		  Rotate(90);
 //	  }
 
-	  HAL_Delay(100);
+//	  HAL_Delay(100);
 
     /* USER CODE END WHILE */
 

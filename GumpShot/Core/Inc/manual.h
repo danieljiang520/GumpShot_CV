@@ -11,6 +11,7 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "controller.h"
+#include "lcd_i2c.h"
 
 
 /************************************** manual typedefs **************************************/
@@ -20,7 +21,7 @@
 /************************************** Public functions **************************************/
 
 void runManualMode(ControllerState *controllerState, GameConfig *gameConfig);
-
+void runEasyMode(GameConfig *gameConfig);
 
 
 #endif /* INC_MANUAL_H_ */

@@ -312,8 +312,6 @@ void lcd_display(uint8_t mode, uint32_t freq, uint16_t speed, uint16_t direction
 		HD44780_PrintStr("Manual");
 	} else if(mode == 1) {
 		HD44780_PrintStr("Easy");
-	} else if(mode == 2) {
-		HD44780_PrintStr("Medium");
 	} else {
 		HD44780_PrintStr("Hard");
 	}

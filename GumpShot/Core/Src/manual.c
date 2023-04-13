@@ -40,3 +40,37 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
         LockingServo();
 
 }
+
+void runEasyMode(GameConfig *gameConfig)
+{
+	if (gameConfig->launcher_timer >= gameConfig->launcher_period) {
+	  gameConfig->launcher_timer = 0;
+	  LockingServo();
+	  lcd_display(gameConfig->mode, gameConfig->launcher_period, gameConfig->speed, gameConfig->direction, 1);
+	}
+	else {
+	  gameConfig->launcher_timer++;
+	  lcd_display(gameConfig->mode, gameConfig->launcher_period, gameConfig->speed, gameConfig->direction, 0);
+
+	}
+
+
+
+//	get paddle location (depth) from pi
+//	calculate motor speed
+//	Set launcher motors to proper power
+	LauncherMotors(gameConfig->speed);
+
+//	get paddle location (side to side) from pi
+//	calculate rotational degrees
+//	Rotate launcher to proper location
+//	Rotate(degrees);
+//	if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+//	  LockingServo();
+//	}
+
+	  	  // Display to LCD
+
+}
+
+
