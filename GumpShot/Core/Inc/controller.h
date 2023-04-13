@@ -60,6 +60,7 @@ ButtonState buttonCreate(void);
 ControllerState controllerStateCreate(void);
 void controllerInit(void);
 void controllerRead(ButtonState *buttonState, ControllerState *controllerState, GameConfig *gameConfig);
+void updateGameConfig(ControllerState *controllerState, GameConfig *gameConfig);
 
 
 #endif /* CONTROLLER_H_ */
