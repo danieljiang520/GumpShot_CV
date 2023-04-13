@@ -177,12 +177,19 @@ void controllerRead(ButtonState *buttonState, ControllerState *controllerState, 
 void updateGameConfig(ControllerState *controllerState, GameConfig *gameConfig) {
 	// Update mode
 	if (controllerState->changeMode == 1) {
-		if (gameConfig->mode == 2) {
+		if (gameConfig->mode >= 2) {
 			gameConfig->mode = 0;
 		} else {
 			++gameConfig->mode;
 		}
 	}
+
+	// if user presses button to increase motor speed
+	if (controllerState->speedControl == 1 && gameConfig->speed <= (SPEED_MAX - SPEED_STEP))
+		gameConfig->speed += SPEED_STEP;
+	// if user presses button to decrease motor speed
+	else if (controllerState->speedControl == -1 && gameConfig->speed >= SPEED_STEP)
+		gameConfig->speed -= SPEED_STEP;
 
 	// Update frequency
 	if (controllerState->freqControl == 1) {

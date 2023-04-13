@@ -16,13 +16,6 @@
 
 void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
 {
-    // if user presses button to increase motor speed
-    if (controllerState->speedControl == 1 && gameConfig->speed <= (SPEED_MAX - SPEED_STEP))
-        gameConfig->speed += SPEED_STEP;
-    // if user presses button to decrease motor speed
-    else if (controllerState->speedControl == -1 && gameConfig->speed >= SPEED_STEP)
-        gameConfig->speed -= SPEED_STEP;
-
     LauncherMotors(gameConfig->speed);
 
     // if user presses button to increase rotation (to the right)
@@ -40,3 +33,35 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
         LockingServo();
 
 }
+
+void runEasyMode(GameConfig *gameConfig)
+{
+	if (gameConfig->launcher_timer >= gameConfig->launcher_period) {
+	  gameConfig->launcher_timer = 0;
+	  LockingServo();
+	}
+	else {
+	  gameConfig->launcher_timer++;
+
+	}
+
+
+
+//	get paddle location (depth) from pi
+//	calculate motor speed
+//	Set launcher motors to proper power
+	LauncherMotors(gameConfig->speed);
+
+//	get paddle location (side to side) from pi
+//	calculate rotational degrees
+//	Rotate launcher to proper location
+//	Rotate(degrees);
+//	if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+//	  LockingServo();
+//	}
+
+	  	  // Display to LCD
+
+}
+
+
