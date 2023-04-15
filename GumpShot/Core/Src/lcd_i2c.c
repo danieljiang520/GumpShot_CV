@@ -1,6 +1,8 @@
 #include "lcd_i2c.h"
 
 extern I2C_HandleTypeDef hi2c1;
+extern GameConfig gameconfig;
+extern ControllerState controllerState;
 
 uint8_t dpFunction;
 uint8_t dpControl;
@@ -295,8 +297,8 @@ static void DelayUS(uint32_t us) {
   } while(cnt < cycles);
 }
 
-void lcd_display(uint8_t mode, uint32_t freq, uint16_t speed, uint16_t direction, uint8_t error) {
-  if(error) {
+void lcd_display(GameConfig *gameConfig) {
+  if(gameConfig->error) {
 	  HD44780_Clear();
     HD44780_SetCursor(1, 1);
     HD44780_PrintStr("Error: Controller");
@@ -306,9 +308,11 @@ void lcd_display(uint8_t mode, uint32_t freq, uint16_t speed, uint16_t direction
   }
 
 	HD44780_SetCursor(8, 0);
-	if(mode == 0) {
+	if(gameConfig->start == 0) {
+    HD44780_PrintStr("STOP  ");
+  } else if(gameConfig->mode == 0) {
 		HD44780_PrintStr("Manual");
-	} else if(mode == 1) {
+	} else if(gameConfig->mode == 1) {
 		HD44780_PrintStr("Easy  ");
 	} else {
 		HD44780_PrintStr("Hard  ");
@@ -316,19 +320,19 @@ void lcd_display(uint8_t mode, uint32_t freq, uint16_t speed, uint16_t direction
 
 	char sfreq[5];
 	HD44780_SetCursor(13, 1);
-	itoa(freq, sfreq, 10);
+	itoa(gameConfig->frequency, sfreq, 10);
 	HD44780_PrintStr(sfreq);
   HD44780_PrintStr(" s ");
 
 	char sspeed[5];
 	HD44780_SetCursor(9, 2);
-	itoa(speed, sspeed, 10);
+	itoa(gameConfig->speed, sspeed, 10);
 	HD44780_PrintStr(sspeed);
 	HD44780_PrintStr(" units   ");
 
   char sdirection[5];
   HD44780_SetCursor(13, 3);
-  itoa(direction, sdirection, 10);
+  itoa(gameConfig->direction, sdirection, 10);
   HD44780_PrintStr(sdirection);
 	HD44780_PrintSpecialChar(0xdf);
   HD44780_PrintStr(" ");
