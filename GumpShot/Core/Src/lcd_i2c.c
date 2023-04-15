@@ -296,49 +296,58 @@ static void DelayUS(uint32_t us) {
 }
 
 void lcd_display(uint8_t mode, uint32_t freq, uint16_t speed, uint16_t direction, uint8_t error) {
-	HD44780_Clear();
-
   if(error) {
-	  HD44780_SetCursor(1, 1);
+	  HD44780_Clear();
+    HD44780_SetCursor(1, 1);
     HD44780_PrintStr("Error: Controller");
     HD44780_SetCursor(4, 2);
     HD44780_PrintStr("not working");
     return;
   }
 
-	HD44780_SetCursor(2, 0);
-	HD44780_PrintStr("Mode: ");
+	HD44780_SetCursor(8, 0);
 	if(mode == 0) {
 		HD44780_PrintStr("Manual");
 	} else if(mode == 1) {
-		HD44780_PrintStr("Easy");
+		HD44780_PrintStr("Easy  ");
 	} else {
-		HD44780_PrintStr("Hard");
+		HD44780_PrintStr("Hard  ");
 	}
 
 	char sfreq[5];
-	HD44780_SetCursor(2, 1);
-	HD44780_PrintStr("Frequency: ");
+	HD44780_SetCursor(13, 1);
 	itoa(freq, sfreq, 10);
 	HD44780_PrintStr(sfreq);
+  HD44780_PrintStr(" s ");
 
 	char sspeed[5];
-	HD44780_SetCursor(2, 2);
-	HD44780_PrintStr("Speed: ");
+	HD44780_SetCursor(9, 2);
 	itoa(speed, sspeed, 10);
 	HD44780_PrintStr(sspeed);
-	HD44780_PrintStr(" units");
+	HD44780_PrintStr(" units   ");
 
   char sdirection[5];
-  HD44780_SetCursor(2, 3);
-  HD44780_PrintStr("Direction: ");
+  HD44780_SetCursor(13, 3);
   itoa(direction, sdirection, 10);
   HD44780_PrintStr(sdirection);
 	HD44780_PrintSpecialChar(0xdf);
+  HD44780_PrintStr(" ");
 }
 
 void lcd_init() {
   HD44780_Init(4);
   HD44780_Clear();
   HD44780_SetBacklight(5);
+
+  HD44780_SetCursor(2, 0);
+	HD44780_PrintStr("Mode: ");
+
+	HD44780_SetCursor(2, 1);
+	HD44780_PrintStr("Frequency: ");
+
+	HD44780_SetCursor(2, 2);
+	HD44780_PrintStr("Speed: ");
+
+  HD44780_SetCursor(2, 3);
+  HD44780_PrintStr("Direction: ");
 }
