@@ -307,14 +307,22 @@ void lcd_display(GameConfig *gameConfig) {
   }
 
 	HD44780_SetCursor(8, 0);
-	if(gameConfig->stop == 1) {
-    HD44780_PrintStr("STOP  ");
-  } else if(gameConfig->mode == 0) {
-		HD44780_PrintStr("Manual");
+	if(gameConfig->mode == 0) {
+		HD44780_PrintStr("Manual       ");
 	} else if(gameConfig->mode == 1) {
-		HD44780_PrintStr("Easy  ");
+		HD44780_PrintStr("Easy");
+    if(gameConfig->stop == 1) {
+      HD44780_PrintStr(" (stop)");
+    } else {
+      HD44780_PrintStr("       ");
+    }
 	} else {
 		HD44780_PrintStr("Hard  ");
+    if(gameConfig->stop == 1) {
+      HD44780_PrintStr(" (stop)");
+    } else {
+      HD44780_PrintStr("       ");
+    }
 	}
 
 	char sfreq[5];
