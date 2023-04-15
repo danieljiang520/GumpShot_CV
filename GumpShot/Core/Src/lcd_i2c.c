@@ -317,7 +317,7 @@ void lcd_display(GameConfig *gameConfig) {
       HD44780_PrintStr("       ");
     }
 	} else {
-		HD44780_PrintStr("Hard  ");
+		HD44780_PrintStr("Hard");
     if(gameConfig->stop == 1) {
       HD44780_PrintStr(" (stop)");
     } else {
@@ -335,7 +335,7 @@ void lcd_display(GameConfig *gameConfig) {
 	HD44780_SetCursor(9, 2);
 	itoa(gameConfig->speed, sspeed, 10);
 	HD44780_PrintStr(sspeed);
-	HD44780_PrintStr(" units   ");
+	HD44780_PrintStr(" %   ");
 
   char sdirection[5];
   HD44780_SetCursor(13, 3);
