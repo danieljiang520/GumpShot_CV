@@ -143,7 +143,7 @@ void controllerRead(ButtonState *buttonState, ControllerState *controllerState, 
 	uint8_t releasedL2 = !buttonState->L2 && L2;
 
 	/* Update manual mode state */
-    controllerState->direction = (releasedRight ? 1 : (releasedLeft ? -1 : 0));
+    controllerState->direction = (releasedLeft ? 1 : (releasedRight ? -1 : 0));
     controllerState->freqControl = (releasedTriangle ? 1 : (releasedX ? -1 : 0));
     controllerState->speedControl = (releasedUp ? 1 : (releasedDown ? -1 : 0));
     controllerState->changeMode = (releasedSelect ? 1 : 0);

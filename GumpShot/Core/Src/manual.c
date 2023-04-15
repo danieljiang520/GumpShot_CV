@@ -22,7 +22,7 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
     if (controllerState->direction == 1 && gameConfig->direction <= (DIRECTION_MAX - DIRECTION_STEP))
         gameConfig->direction += DIRECTION_STEP;
     // if user presses button to decrease rotation (to the left)
-    else if (controllerState->direction && gameConfig->direction >= DIRECTION_STEP)
+    else if (controllerState->direction && gameConfig->direction >= (DIRECTION_MIN + DIRECTION_STEP))
         gameConfig->direction -= DIRECTION_STEP;
 
 
@@ -36,29 +36,22 @@ void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
 
 void runEasyMode(GameConfig *gameConfig)
 {
-	if (gameConfig->launcher_timer >= gameConfig->launcher_period) {
-	  gameConfig->launcher_timer = 0;
-	  LockingServo();
-	}
-	else {
-	  gameConfig->launcher_timer++;
-
-	}
-
-
+//	if (gameConfig->launcher_timer >= gameConfig->launcher_period) {
+//	  gameConfig->launcher_timer = 0;
+//	}
+//	else {
+//	  gameConfig->launcher_timer++;
+//	}
 
 //	get paddle location (depth) from pi
 //	calculate motor speed
 //	Set launcher motors to proper power
-	LauncherMotors(gameConfig->speed);
 
 //	get paddle location (side to side) from pi
 //	calculate rotational degrees
 //	Rotate launcher to proper location
 //	Rotate(degrees);
-//	if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
-//	  LockingServo();
-//	}
+
 
 	  	  // Display to LCD
 

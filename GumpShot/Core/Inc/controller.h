@@ -14,8 +14,9 @@
 extern SPI_HandleTypeDef hspi2;
 
 #define PERIOD_STEP 20
-#define DIRECTION_MAX 135
-#define DIRECTION_STEP 3
+#define DIRECTION_MAX 120
+#define DIRECTION_MIN 60
+#define DIRECTION_STEP 5
 #define SPEED_MAX 100
 #define SPEED_STEP 5
 /************************************** controller typedefs **************************************/
