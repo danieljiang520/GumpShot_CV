@@ -199,5 +199,17 @@ void updateGameConfig(ControllerState *controllerState, GameConfig *gameConfig) 
 		gameConfig->launcher_period -= PERIOD_STEP;
 	}
 
+	// Update start
+	if (controllerState->stop == 1) {
+		// not stop
+		if (gameConfig->stop == 0)
+			gameConfig->stop = 1;
+		else
+			gameConfig->stop = 0;
+	}
+	else if (controllerState->freqControl == -1 & gameConfig->launcher_period >= PERIOD_STEP) {
+		gameConfig->launcher_period -= PERIOD_STEP;
+	}
+
 }
 

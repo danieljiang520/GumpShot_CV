@@ -57,14 +57,23 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim5;
 
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart6;
+DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
+
+char data[6];
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	HAL_UART_Receive_DMA(&huart2, data, 3);
+}
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_TIM2_Init(void);
@@ -72,6 +81,7 @@ static void MX_TIM5_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_USART6_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 
@@ -79,7 +89,7 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD, 0};
+GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD, 0, 0};
 uint8_t lcd_ready = 0; // 0 not initialized; 1 initialized;
 /* USER CODE END 0 */
 
@@ -110,6 +120,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
   MX_TIM2_Init();
@@ -117,11 +128,13 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM3_Init();
   MX_USART2_UART_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
+
   // lcd
   HAL_TIM_IC_Init(&htim5);
   HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);
@@ -138,13 +151,26 @@ int main(void)
   ButtonState buttonState = buttonCreate();
   ControllerState controllerState = controllerStateCreate();
 
+
+  HAL_UART_Receive_DMA(&huart2, data, 3);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // Reading receive SPI
 	  controllerRead(&buttonState, &controllerState, &gameConfig);
+
+	  // Reading UART receive
+//	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+//	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+	  HAL_UART_Receive(&huart6, data, 6, 1000);
+
+
+
+
 
 	  // if manual mode
 	  if (gameConfig.mode == 0) {
@@ -155,39 +181,9 @@ int main(void)
 		  runEasyMode(&gameConfig);
 	  }
 
+	  // Setting speed
 	  LauncherMotors(gameConfig.speed);
 
-
-
-	  // if in easy mode
-	  	  // if user presses button to decrease launching frequency
-	  	  	  // launcher_period = launcher_period + 10;
-	  	  // if user presses button to increase launching frequency
-	  	  	  // launcher_period = launcher_period - 10;
-	  	  // if launcher_period < 20
-	  	  	  // launcher_period = 20;
-
-//	  	  if (launcher_timer >= launcher_period) {
-//			  launcher_timer = 0;
-//			  LockingServo();
-//		  }
-//	  	  else {
-//	  		  launcher_timer = launcher_timer + 1;
-//	  	  }
-
-	  	  // get paddle location (depth) from pi
-		  // calculate motor speed
-		  // Set launcher motors to proper power
-		  // LauncherMotors(speed);
-		  // get paddle location (side to side) from pi
-		  // calculate rotational degrees
-		  // Rotate launcher to proper location
-		  // Rotate(degrees);
-//		  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
-//			  LockingServo();
-//		  }
-
-	  	  // Display to LCD
 
 
 
@@ -221,37 +217,6 @@ int main(void)
 
 	  	  // Display to LCD
 
-
-
-	  // Hard coded test loop
-//	  if (launcher_timer == launcher_period) {
-//  	  	  launcher_timer = 0;
-//  	  	  //LockingServo();
-//  	  }
-//	  else {
-//		  launcher_timer = launcher_timer + 1;
-//	  }
-//	  // get paddle location (depth) from pi
-//	  // calculate motor speed
-//	  // Set launcher motors to proper power
-//	  LauncherMotors(24);
-//	  // get paddle location (side to side) from pi
-//	  // calculate rotational degrees
-//	  // Rotate launcher to proper location
-//
-//	  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
-//		  LockingServo();
-//	  }
-//	  if (launcher_timer > 5) {
-//		  LauncherMotors(24);
-//		  Rotate(100);
-//	  }
-//	  else {
-//		  LauncherMotors(30);
-//		  Rotate(90);
-//	  }
-
-//	  HAL_Delay(100);
 
     /* USER CODE END WHILE */
 
@@ -664,6 +629,55 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief USART6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART6_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART6_Init 0 */
+
+  /* USER CODE END USART6_Init 0 */
+
+  /* USER CODE BEGIN USART6_Init 1 */
+
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 9600;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART6_Init 2 */
+
+  /* USER CODE END USART6_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
 
 }
 

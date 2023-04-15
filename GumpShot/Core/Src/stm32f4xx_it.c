@@ -43,7 +43,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 extern GameConfig gameConfig;
-extern ControllerState controllerState;
 extern lcd_ready;
 /* USER CODE END PV */
 
@@ -61,6 +60,7 @@ extern lcd_ready;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim5;
+extern DMA_HandleTypeDef hdma_usart2_rx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -202,6 +202,20 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles DMA1 stream5 global interrupt.
+  */
+void DMA1_Stream5_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
+
+  /* USER CODE END DMA1_Stream5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_rx);
+  /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream5_IRQn 1 */
+}
 
 /**
   * @brief This function handles TIM1 break interrupt and TIM9 global interrupt.

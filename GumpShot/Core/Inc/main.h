@@ -43,6 +43,7 @@ typedef struct {
 	uint16_t direction; // turning direction (º): 90 = center, 180 = left, 0 = right
 	uint32_t launcher_timer;
 	uint32_t launcher_period;
+	uint8_t stop;
 	uint8_t error;
 } GameConfig;
 
