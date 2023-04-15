@@ -2,7 +2,6 @@
 
 extern I2C_HandleTypeDef hi2c1;
 extern GameConfig gameconfig;
-extern ControllerState controllerState;
 
 uint8_t dpFunction;
 uint8_t dpControl;
