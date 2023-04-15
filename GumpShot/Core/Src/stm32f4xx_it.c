@@ -43,7 +43,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 extern GameConfig gameConfig;
-extern lcd_ready;
+extern int lcd_not_ready;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -237,7 +237,7 @@ void TIM1_BRK_TIM9_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-  if (gameConfig.mode != 0) {
+  if (gameConfig.mode != 0 && gameConfig.stop == 0) {
 	LockingServo();
   }
   /* USER CODE END TIM3_IRQn 0 */
@@ -253,8 +253,8 @@ void TIM3_IRQHandler(void)
 void TIM5_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM5_IRQn 0 */
-	if (lcd_ready == 1) {
-		lcd_display(gameConfig.mode, gameConfig.launcher_period, gameConfig.speed, gameConfig.direction, gameConfig.error);
+	if (lcd_not_ready == 0) {
+		lcd_display(&gameConfig);
 	}
 
   /* USER CODE END TIM5_IRQn 0 */

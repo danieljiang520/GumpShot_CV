@@ -148,7 +148,7 @@ void controllerRead(ButtonState *buttonState, ControllerState *controllerState, 
     controllerState->speedControl = (releasedUp ? 1 : (releasedDown ? -1 : 0));
     controllerState->changeMode = (releasedSelect ? 1 : 0);
     controllerState->launch = (releasedSquare ? 1 : 0);
-    controllerState->stop = (releasedL1 && releasedL2 && releasedR1 && releasedR2 ? 1 : 0);
+    controllerState->stop = (releasedCircle ? 1 : 0);
 
     buttonState->left = left;
     buttonState->down = down;
@@ -206,9 +206,6 @@ void updateGameConfig(ControllerState *controllerState, GameConfig *gameConfig) 
 			gameConfig->stop = 1;
 		else
 			gameConfig->stop = 0;
-	}
-	else if (controllerState->freqControl == -1 & gameConfig->launcher_period >= PERIOD_STEP) {
-		gameConfig->launcher_period -= PERIOD_STEP;
 	}
 
 }

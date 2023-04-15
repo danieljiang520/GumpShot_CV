@@ -1,7 +1,7 @@
 #include "lcd_i2c.h"
 
 extern I2C_HandleTypeDef hi2c1;
-extern GameConfig gameconfig;
+extern int lcd_not_ready;
 
 uint8_t dpFunction;
 uint8_t dpControl;
@@ -307,7 +307,7 @@ void lcd_display(GameConfig *gameConfig) {
   }
 
 	HD44780_SetCursor(8, 0);
-	if(gameConfig->start == 0) {
+	if(gameConfig->stop == 1) {
     HD44780_PrintStr("STOP  ");
   } else if(gameConfig->mode == 0) {
 		HD44780_PrintStr("Manual");
@@ -319,7 +319,7 @@ void lcd_display(GameConfig *gameConfig) {
 
 	char sfreq[5];
 	HD44780_SetCursor(13, 1);
-	itoa(gameConfig->frequency, sfreq, 10);
+	itoa(gameConfig->launcher_period, sfreq, 10);
 	HD44780_PrintStr(sfreq);
   HD44780_PrintStr(" s ");
 
@@ -353,4 +353,6 @@ void lcd_init() {
 
   HD44780_SetCursor(2, 3);
   HD44780_PrintStr("Direction: ");
+
+  lcd_not_ready = 0;
 }

@@ -89,8 +89,8 @@ static void MX_USART6_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD, 0, 0};
-uint8_t lcd_ready = 0; // 0 not initialized; 1 initialized;
+GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD, 1, 0};
+uint8_t lcd_not_ready = 1; // 1 not initialized; 0 initialized;
 /* USER CODE END 0 */
 
 /**
@@ -142,7 +142,6 @@ int main(void)
   HAL_TIM_IC_Init(&htim3);
   HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
   lcd_init();
-  lcd_ready = 1;
 
 
   // Initialize gate for balls
@@ -166,7 +165,8 @@ int main(void)
 	  // Reading UART receive
 //	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
 //	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
-	  HAL_UART_Receive(&huart6, data, 6, 1000);
+
+	  HAL_UART_Receive(&huart6, data, 6, 100);
 
 
 
