@@ -16,44 +16,58 @@
 
 void runManualMode(ControllerState *controllerState, GameConfig *gameConfig)
 {
-    LauncherMotors(gameConfig->speed);
 
     // if user presses button to increase rotation (to the right)
     if (controllerState->direction == 1 && gameConfig->direction <= (DIRECTION_MAX - DIRECTION_STEP))
         gameConfig->direction += DIRECTION_STEP;
     // if user presses button to decrease rotation (to the left)
-    else if (controllerState->direction && gameConfig->direction >= (DIRECTION_MIN + DIRECTION_STEP))
+    else if (controllerState->direction == -1 && gameConfig->direction >= (DIRECTION_MIN + DIRECTION_STEP))
         gameConfig->direction -= DIRECTION_STEP;
 
-
-    Rotate(gameConfig->direction);
 
     // if user presses button to launch ping pong ball
     if (controllerState->launch == 1)
         LockingServo();
 
+
+    Rotate(gameConfig->direction);
+
+
+}
+
+void readUART(GameConfig *gameConfig, char data[]) {
+	uint16_t tempDegree = 0;
+	int exponent = 0;
+	//read from least significant bit
+	for (int i = 5; i >= 0; --i) {
+		char c = data[i];
+		if (c == 'f') {
+			continue;
+		}
+
+		else if (c == 's'){
+			break;
+		}
+
+		else if ('0' <= c && c <= '9') {
+		    uint16_t base = c - '0';
+		    tempDegree += base * pow(10, exponent);
+		    exponent++;
+		}
+	}
+
+	// update gameConfig only if tempDegree != 0 or 999 (no bounding box)
+	if (tempDegree >= DIRECTION_MIN && tempDegree <= DIRECTION_MAX) {
+		gameConfig->direction = tempDegree;
+	}
 }
 
 void runEasyMode(GameConfig *gameConfig)
 {
-//	if (gameConfig->launcher_timer >= gameConfig->launcher_period) {
-//	  gameConfig->launcher_timer = 0;
-//	}
-//	else {
-//	  gameConfig->launcher_timer++;
-//	}
-
-//	get paddle location (depth) from pi
-//	calculate motor speed
-//	Set launcher motors to proper power
-
-//	get paddle location (side to side) from pi
-//	calculate rotational degrees
-//	Rotate launcher to proper location
-//	Rotate(degrees);
 
 
-	  	  // Display to LCD
+
+//	  Rotate(gameConfig->direction);
 
 }
 

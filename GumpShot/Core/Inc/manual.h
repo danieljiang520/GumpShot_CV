@@ -12,6 +12,7 @@
 #include "main.h"
 #include "controller.h"
 #include "lcd_i2c.h"
+#include <math.h>
 
 
 /************************************** manual typedefs **************************************/

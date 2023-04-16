@@ -59,8 +59,8 @@ extern int lcd_not_ready;
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim5;
-extern DMA_HandleTypeDef hdma_usart2_rx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -204,20 +204,6 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 stream5 global interrupt.
-  */
-void DMA1_Stream5_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
-
-  /* USER CODE END DMA1_Stream5_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart2_rx);
-  /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
-
-  /* USER CODE END DMA1_Stream5_IRQn 1 */
-}
-
-/**
   * @brief This function handles TIM1 break interrupt and TIM9 global interrupt.
   */
 void TIM1_BRK_TIM9_IRQHandler(void)
@@ -237,14 +223,45 @@ void TIM1_BRK_TIM9_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-  if (gameConfig.mode != 0 && gameConfig.stop == 0) {
-	LockingServo();
-  }
+
+	if (gameConfig.stop == 1) {
+		HAL_TIM_IRQHandler(&htim3);
+		return;
+	}
+
+	// easy mode
+	if (gameConfig.mode == 1) {
+		Rotate(gameConfig.direction);
+		LockingServo();
+	}
+
+	// hard mode
+	else if (gameConfig.mode == 2) {
+		Rotate(gameConfig.direction);
+		LockingServo();
+	}
+
+
+
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 
   /* USER CODE END TIM3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM4 global interrupt.
+  */
+void TIM4_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM4_IRQn 0 */
+
+  /* USER CODE END TIM4_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim4);
+  /* USER CODE BEGIN TIM4_IRQn 1 */
+
+  /* USER CODE END TIM4_IRQn 1 */
 }
 
 /**
