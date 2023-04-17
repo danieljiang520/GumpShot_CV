@@ -57,17 +57,34 @@ void readUART(GameConfig *gameConfig, char data[]) {
 	}
 
 	// update gameConfig only if tempDegree != 0 or 999 (no bounding box)
-	if (tempDegree >= DIRECTION_MIN && tempDegree <= DIRECTION_MAX) {
+	if ((tempDegree >= DIRECTION_MIN && tempDegree <= DIRECTION_MAX) || tempDegree == 999) {
 		gameConfig->direction = tempDegree;
 	}
 }
 
-void runEasyMode(GameConfig *gameConfig)
-{
+//void runEasyMode(GameConfig *gameConfig)
+//{
+//
+//
+//
+////	  Rotate(gameConfig->direction);
+//
+//}
+uint16_t positions[5] = {75, 82, 90, 98, 105};
 
 
+void calcRandDirection(GameConfig *gameConfig) {
+	uint8_t offset_idx = 1 + rand() % 4; // 1-4
 
-//	  Rotate(gameConfig->direction);
+	uint8_t idx = 0;
+	for (int i=0; i < 5; ++i) {
+		if (positions[i] == gameConfig->direction) {
+			idx = i;
+			break;
+		}
+	}
+	offset_idx = (offset_idx + idx) % 5;
+	gameConfig->direction = positions[offset_idx]; ;
 
 }
 

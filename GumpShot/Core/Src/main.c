@@ -91,7 +91,7 @@ static void MX_TIM4_Init(void);
 /* USER CODE BEGIN 0 */
 GameConfig gameConfig = {DEFAULT_MODE, DEFAULT_SPEED, DEFAULT_DIRECTION, 0, DEFAULT_PERIOD, 1, 0};
 uint8_t lcd_not_ready = 1; // 1 not initialized; 0 initialized;
-
+uint8_t offset_idx = 2;
 
 
 
@@ -145,6 +145,9 @@ int main(void)
   // shooting
   HAL_TIM_IC_Init(&htim3);
   HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+  // turning
+  HAL_TIM_IC_Init(&htim4);
+  HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);
   lcd_init();
 
 
@@ -177,7 +180,6 @@ int main(void)
 
 		  // update gameConfig direction
 		  readUART(&gameConfig, data);
-
 //		  runEasyMode(&gameConfig);
 	  }
 	  // hard mode
@@ -564,9 +566,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 0;
+  htim4.Init.Prescaler = 16799;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 65535;
+  htim4.Init.Period = 1000;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -774,7 +776,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void LockingServo(){
 	TIM1->CCR1 = 80;
-	HAL_Delay(300);
+	HAL_Delay(400);
 	TIM1->CCR1 = 150;
 }
 

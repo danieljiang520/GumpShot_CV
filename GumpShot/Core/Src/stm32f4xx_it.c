@@ -54,6 +54,7 @@ extern int lcd_not_ready;
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -229,15 +230,8 @@ void TIM3_IRQHandler(void)
 		return;
 	}
 
-	// easy mode
-	if (gameConfig.mode == 1) {
-		Rotate(gameConfig.direction);
-		LockingServo();
-	}
-
-	// hard mode
-	else if (gameConfig.mode == 2) {
-		Rotate(gameConfig.direction);
+	// easy mode or hard mode
+	if ((gameConfig.mode != 0) && gameConfig.direction != 999) {
 		LockingServo();
 	}
 
@@ -256,6 +250,22 @@ void TIM3_IRQHandler(void)
 void TIM4_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM4_IRQn 0 */
+	if ((gameConfig.stop == 1) || gameConfig.direction == 999) {
+		HAL_TIM_IRQHandler(&htim4);
+		return;
+	}
+
+	// easy mode
+	if (gameConfig.mode == 1) {
+		Rotate(gameConfig.direction);
+	}
+	// hard mode
+	else if (gameConfig.mode == 2) {
+		calcRandDirection(&gameConfig);
+		Rotate(gameConfig.direction);
+	}
+
+
 
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);

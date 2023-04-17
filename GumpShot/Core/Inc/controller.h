@@ -16,8 +16,8 @@ extern SPI_HandleTypeDef hspi2;
 #define PERIOD_MAX 12
 #define PERIOD_MIN 2
 #define PERIOD_STEP 1
-#define DIRECTION_MAX 120
-#define DIRECTION_MIN 60
+#define DIRECTION_MAX 105
+#define DIRECTION_MIN 75
 #define DIRECTION_STEP 5
 #define SPEED_MAX 100
 #define SPEED_STEP 5
