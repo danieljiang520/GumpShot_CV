@@ -74,7 +74,8 @@ uint16_t positions[5] = {75, 82, 90, 98, 105};
 
 
 void calcRandDirection(GameConfig *gameConfig) {
-	uint8_t offset_idx = 1 + rand() % 4; // 1-4
+//	uint8_t offset_idx = 1 + rand() % 4; // 1-4
+	uint8_t offset_idx = 2; // 1-4
 
 	uint8_t idx = 0;
 	for (int i=0; i < 5; ++i) {

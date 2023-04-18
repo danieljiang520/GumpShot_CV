@@ -186,42 +186,13 @@ int main(void)
 	  else if (gameConfig.mode == 1) {
 		  // Reading UART receive
 		  HAL_UART_Receive(&huart6, data, 6, 100);
-
+		  readUART(&gameConfig, data);
 		  //runHardMode(&gameConfig);
 	  }
 
 	  // Setting speed
 	  LauncherMotors(gameConfig.speed);
 
-
-
-	  // if in hard mode
-		  // if user presses button to decrease launching frequency
-			  // launcher_period = launcher_period + 10;
-		  // if user presses button to increase launching frequency
-			  // launcher_period = launcher_period - 10;
-		  // if launcher_period < 20
-			  // launcher_period = 20;
-
-//		  if (launcher_timer == launcher_frequency) {
-//			  launcher_timer = 0;
-//			  LockingServo();
-//		  }
-//		  else {
-//			  launcher_timer = launcher_timer + 1;
-//		  }
-
-		  // get paddle location (depth) from pi
-		  // calculate motor speed
-		  // Set launcher motors to proper power
-		  // LauncherMotors(speed);
-		  // get paddle location (side to side) from pi
-		  // calculate rotational degrees
-		  // Rotate launcher to proper location
-		  // Rotate(degrees);
-//		  if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
-//			  LockingServo();
-//		  }
 
 
     /* USER CODE END WHILE */
@@ -775,7 +746,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void LockingServo(){
-	TIM1->CCR1 = 80;
+	TIM1->CCR1 = 70;
 	HAL_Delay(400);
 	TIM1->CCR1 = 150;
 }
