@@ -339,7 +339,8 @@ void lcd_display(GameConfig *gameConfig) {
 
   char sdirection[5];
   HD44780_SetCursor(13, 3);
-  itoa(gameConfig->direction, sdirection, 10);
+  int angle = gameConfig->direction - 90;
+  itoa(angle, sdirection, 10);
   HD44780_PrintStr(sdirection);
 	HD44780_PrintSpecialChar(0xdf);
   HD44780_PrintStr(" ");
