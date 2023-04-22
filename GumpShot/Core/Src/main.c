@@ -35,7 +35,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define DEFAULT_MODE 0
-#define DEFAULT_SPEED 25
+#define DEFAULT_SPEED 55
 #define DEFAULT_DIRECTION 90
 #define DEFAULT_PERIOD 6
 
@@ -183,10 +183,11 @@ int main(void)
 //		  runEasyMode(&gameConfig);
 	  }
 	  // hard mode
-	  else if (gameConfig.mode == 1) {
+	  else if (gameConfig.mode == 2) {
 		  // Reading UART receive
-		  HAL_UART_Receive(&huart6, data, 6, 100);
-		  readUART(&gameConfig, data);
+//		  HAL_UART_Receive(&huart6, data, 6, 100);
+
+//		  readUART(&gameConfig, data);
 		  //runHardMode(&gameConfig);
 	  }
 
