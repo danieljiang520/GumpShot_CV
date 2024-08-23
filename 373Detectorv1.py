@@ -1,71 +1,153 @@
 import cv2
 import numpy as np
-# Stacks multiple images into 1 large image, useful for comparing and testing.
-def stackImages(scale,imgArray,lables=[]):
-    sizeW= imgArray[0][0].shape[1]
-    sizeH = imgArray[0][0].shape[0]
-    rows = len(imgArray)
-    cols = len(imgArray[0])
-    rowsAvailable = isinstance(imgArray[0], list)
-    width = imgArray[0][0].shape[1]
-    height = imgArray[0][0].shape[0]
-    if rowsAvailable:
-        for x in range ( 0, rows):
-            for y in range(0, cols):
-                imgArray[x][y] = cv2.resize(imgArray[x][y], (sizeW, sizeH), None, scale, scale)
-                if len(imgArray[x][y].shape) == 2: imgArray[x][y]= cv2.cvtColor( imgArray[x][y], cv2.COLOR_GRAY2BGR)
-        imageBlank = np.zeros((height, width, 3), np.uint8)
-        hor = [imageBlank]*rows
-        hor_con = [imageBlank]*rows
-        for x in range(0, rows):
-            hor[x] = np.hstack(imgArray[x])
-            hor_con[x] = np.concatenate(imgArray[x])
+import argparse
+
+
+def stack_images(scale, img_array, labels=[]):
+    """
+    Stacks multiple images into one large image, useful for comparing and testing.
+
+    Args:
+        scale (float): Scaling factor for resizing the images.
+        img_array (list): A list of images (or list of lists of images) to be stacked.
+        labels (list, optional): A list of labels corresponding to the images. Defaults to [].
+
+    Returns:
+        np.ndarray: The stacked image.
+    """
+    rows = len(img_array)
+    cols = len(img_array[0])
+    size_w = img_array[0][0].shape[1]
+    size_h = img_array[0][0].shape[0]
+
+    if isinstance(img_array[0], list):
+        img_array = [
+            [
+                cv2.resize(img, (size_w, size_h), None, scale, scale)
+                if len(img.shape) != 2
+                else cv2.cvtColor(cv2.resize(img, (size_w, size_h)), cv2.COLOR_GRAY2BGR)
+                for img in row
+            ]
+            for row in img_array
+        ]
+        hor = [np.hstack(row) for row in img_array]
         ver = np.vstack(hor)
-        ver_con = np.concatenate(hor)
     else:
-        for x in range(0, rows):
-            imgArray[x] = cv2.resize(imgArray[x], (sizeW, sizeH), None, scale, scale)
-            if len(imgArray[x].shape) == 2: imgArray[x] = cv2.cvtColor(imgArray[x], cv2.COLOR_GRAY2BGR)
-        hor= np.hstack(imgArray)
-        hor_con= np.concatenate(imgArray)
-        ver = hor
-    if len(lables) != 0:
-        eachImgWidth= int(ver.shape[1] / cols)
-        eachImgHeight = int(ver.shape[0] / rows)
-        print(eachImgHeight)
-        for d in range(0, rows):
-            for c in range (0,cols):
-                cv2.rectangle(ver,(c*eachImgWidth,eachImgHeight*d),(c*eachImgWidth+len(lables[d][c])*13+27,30+eachImgHeight*d),(255,255,255),cv2.FILLED)
-                cv2.putText(ver,lables[d][c],(eachImgWidth*c+10,eachImgHeight*d+20),cv2.FONT_HERSHEY_COMPLEX,0.7,(255,0,255),2)
+        img_array = [
+            cv2.resize(img, (size_w, size_h), None, scale, scale)
+            if len(img.shape) != 2
+            else cv2.cvtColor(cv2.resize(img, (size_w, size_h)), cv2.COLOR_GRAY2BGR)
+            for img in img_array
+        ]
+        ver = np.hstack(img_array)
+
+    if labels:
+        each_img_width = int(ver.shape[1] / cols)
+        each_img_height = int(ver.shape[0] / rows)
+        for d in range(rows):
+            for c in range(cols):
+                cv2.rectangle(
+                    ver,
+                    (c * each_img_width, each_img_height * d),
+                    (
+                        c * each_img_width + len(labels[d][c]) * 13 + 27,
+                        30 + each_img_height * d,
+                    ),
+                    (255, 255, 255),
+                    cv2.FILLED,
+                )
+                cv2.putText(
+                    ver,
+                    labels[d][c],
+                    (each_img_width * c + 10, each_img_height * d + 20),
+                    cv2.FONT_HERSHEY_COMPLEX,
+                    0.7,
+                    (255, 0, 255),
+                    2,
+                )
     return ver
 
 
-cap = cv2.VideoCapture(0)
-print("capturing")
-hsvRange=[[[170,170,80],[180,255,255]],[[0,170,80],[10,255,255]]]
-while cap.isOpened():
-    ret, img = cap.read()
-    hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    mask=cv2.inRange(hsv,np.array([hsvRange[0][0]]),np.array([hsvRange[0][1]]))
-    if(len(hsvRange)>1):
-        for x in hsvRange[1:]:
-            mask2=cv2.inRange(hsv,np.array([x[0]]),np.array([x[1]]))
-            mask = cv2.bitwise_or(mask,mask2)
-    #cv2.HoughCircles(input, method, dp, spacing, None, param1(internal canny detector), param2(confermation thresh), minRadius, maxRadius)
-    circles=cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1.2, img.shape[0], None,100,25, int(img.shape[0]/40), int(img.shape[1]/5))#, int(img.shape[0]/10), int(img.shape[1]/2)
+def process_image(img, hsv_range):
+    """
+    Processes the image by converting it to HSV, applying the mask, and detecting circles.
 
-    if circles is not None:#if circles is not empty
-        circles=np.round(circles[0,:]).astype("int")#formatting line
-        for(a,b,r) in circles:#iterates through all circles found in crop
-            cv2.circle(img,(a,b),r, (255,0,0),7)#draws a circle
-                        
-    imgStack=stackImages(0.3, ([img],[mask]))
-    cv2.imshow('img',imgStack)
-    k = cv2.waitKey(27) & 0xff
+    Args:
+        img (np.ndarray): The input image to be processed.
+        hsv_range (list): A list of HSV range tuples for masking.
 
-    if k==ord('q'):
-        break
+    Returns:
+        tuple: A tuple containing the processed image and mask.
+    """
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, np.array(hsv_range[0][0]), np.array(hsv_range[0][1]))
 
-cap.release()
-cv2.destroyAllWindows()
-print("end"); 
+    for x in hsv_range[1:]:
+        mask2 = cv2.inRange(hsv, np.array(x[0]), np.array(x[1]))
+        mask = cv2.bitwise_or(mask, mask2)
+
+    circles = cv2.HoughCircles(
+        mask,
+        cv2.HOUGH_GRADIENT,
+        1.2,
+        img.shape[0],
+        None,
+        100,
+        25,
+        int(img.shape[0] / 40),
+        int(img.shape[1] / 5),
+    )
+
+    if circles is not None:
+        circles = np.round(circles[0, :]).astype("int")
+        for (a, b, r) in circles:
+            cv2.circle(img, (a, b), r, (255, 0, 0), 7)
+
+    return img, mask
+
+
+def main(scale, hsv_range):
+    """
+    Main function to capture video, process images, and display stacked images.
+
+    Args:
+        scale (float): Scaling factor for resizing the images.
+        hsv_range (list): A list of HSV range tuples for masking.
+    """
+    cap = cv2.VideoCapture(0)
+    print("Capturing...")
+
+    while cap.isOpened():
+        ret, img = cap.read()
+        if not ret:
+            break
+
+        img, mask = process_image(img, hsv_range)
+        img_stack = stack_images(scale, ([img], [mask]))
+        cv2.imshow('Image', img_stack)
+
+        if cv2.waitKey(27) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+    print("End.")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Image stacking and processing with OpenCV.")
+    parser.add_argument(
+        "--scale", type=float, default=0.3, help="Scale factor for image resizing."
+    )
+    parser.add_argument(
+        "--hsv_range",
+        type=list,
+        default=[
+            [[170, 170, 80], [180, 255, 255]],
+            [[0, 170, 80], [10, 255, 255]],
+        ],
+        help="List of HSV ranges for masking.",
+    )
+    args = parser.parse_args()
+
+    main(args.scale, args.hsv_range)
